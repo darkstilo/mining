@@ -3,11 +3,11 @@ clear
 # Copyright BYETFAST
 # SSH TLS
 # Miner por: noncepool
-# MINERADOR  ZPOOL BY: FENIX_LINUX, ECOLOGYC
+# MINERADOR  ZPOOL BY: FENIX_LINUX
 # EDITED BY: 8TH.
 
 timer () {
-apt-get install at -y
+sudo apt-get install at -y
 echo -e "Eliminando PIDS"
  for _pids_ in `atq | awk '{print $1}'`; do
  atrm $_pids_
@@ -25,7 +25,7 @@ echo 'for pids in `ps x|grep -v grep|grep minerd`; do' >> /bin/cron
 echo "kill -9 $pids" >> /bin/cron
 echo "done" >> /bin/cron
 echo "at -f /bin/cron now + 30 min" >> /bin/cron
-chmod 777 /bin/cron && bash /bin/cron & > /dev/null
+sudo chmod 777 /bin/cron && bash /bin/cron & > /dev/null
 }
 
 starts () {
@@ -50,9 +50,9 @@ make
 cd miner 
 sudo mv minerd /usr/local/bin/
 #INSTALANDO CPU LIMIT
-apt-get update >/dev/null
-apt-get install aptitude -y >/dev/null
-aptitude install cpulimit
+sudo apt-get update >/dev/null
+sudo apt-get install aptitude -y >/dev/null
+sudo aptitude install cpulimit
 [[ ${cpulimit} != "" ]] && sudo screen -dmS cpu cpulimit -e minerd -l ${cpulimit}
 #EXECUTANDO
 if [[ $timer = "s" ]]; then
