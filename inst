@@ -1,0 +1,87 @@
+#!/bin/sh
+clear
+# Copyright BYETFAST
+# SSH TLS
+# Miner por: noncepool
+# MINERADOR  ZPOOL BY: FENIX_LINUX, ECOLOGYC
+# EDITED BY: 8TH.
+
+timer () {
+apt-get install at -y
+echo -e "Eliminando PIDS"
+ for _pids_ in `atq | awk '{print $1}'`; do
+ atrm $_pids_
+ done
+crontab -r
+echo -e "Parando Processos"
+ for pids in `ps x|grep -v grep|grep minerd`; do
+ kill -9 pids
+ done
+echo -e "Iniciando TIMMER"
+echo "#!/bin/bash" > /bin/cron
+echo "sudo screen -dmS zpool minerd -a ${algoritimo} -o stratum+tcp://${stratum} -t ${core} -R 30" >> /bin/cron
+echo "sleep ${sllep}m" >> /bin/cron
+echo 'for pids in `ps x|grep -v grep|grep minerd`; do' >> /bin/cron
+echo "kill -9 $pids" >> /bin/cron
+echo "done" >> /bin/cron
+echo "at -f /bin/cron now + 30 min" >> /bin/cron
+chmod 777 /bin/cron && bash /bin/cron & > /dev/null
+}
+
+starts () {
+#COLETANDO VARIAVEIS
+algoritimo="$1"
+stratum="$2"
+core="$3"
+cpulimit="$4"
+#INSTALANDO MINNER
+sudo apt-get update >/dev/null
+sudo apt-get install git -y >/dev/null
+sudo apt-get install screen -y >/dev/null
+sudo apt-get install build-essential libcurl4-openssl-dev gcc make git nano autoconf automake -y >/dev/null
+sudo rm -r miner 
+git clone https://github.com/noncepool/cpuminer-yescrypt.git miner
+clear
+echo "\033[44;1;37m Configurando e Compilando Recursos....."
+cd miner 
+./autogen.sh 
+./configure CFLAGS="-O3" 
+make 
+cd miner 
+sudo mv minerd /usr/local/bin/
+#INSTALANDO CPU LIMIT
+apt-get update >/dev/null
+apt-get install aptitude -y >/dev/null
+aptitude install cpulimit
+[[ ${cpulimit} != "" ]] && sudo screen -dmS cpu cpulimit -e minerd -l ${cpulimit}
+#EXECUTANDO
+if [[ $timer = "s" ]]; then
+read -p "Minutos de Mineracao: " sllep
+timer 
+else
+sudo screen -dmS zpool minerd -a ${algoritimo} -o stratum+tcp://${stratum} -t ${core} -R 30
+fi
+echo -e "\033[44;1;37m Procedimento concluido, e Mineracao Iniciada! \033[1;31m"
+}
+
+__ini__ () {
+#INICIANDO COLETA
+echo -e "Forma de Uso:\nbash $0 'algoritimo' 'stratum' 'core' 'wallet' 'cpulimit'\nbash $0 teste.tk 192.169.12.13:8999 8 0"
+algoritimo="$1"
+stratum="$2"
+core="$3"
+cpulimit="$4"
+timer="$5"
+[[ "$(echo ${algoritimo})" = "" ]] && read -p "Selecione o Algoritmo: " algoritimo
+[[ "$(echo ${stratum})" = "" ]] && read -p "Proxy Stratum: " stratum
+[[ "$(echo ${core})" = "" ]] && read -p "Nucleos: " core
+[[ "$(echo ${cpulimit})" = "" ]] && read -p "cpu limit: " cpulimit
+[[ "$(echo ${timer})" = "" ]] && read -p "iniciar timer [s|n]: " timer
+if [[ "$(echo ${cpulimit})" -gt "0" ]]; then
+starts ${algoritimo} ${stratum} ${core} ${cpulimit}
+else
+starts ${algoritimo} ${stratum} ${core} 0
+fi
+}
+__ini__ "$1" "$2" "$3" "$4" "$5"
+echo -ne "\033[0m"
