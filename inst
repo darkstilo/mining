@@ -6,27 +6,28 @@ clear
 # MINERADOR  ZPOOL BY: FENIX_LINUX
 # EDITED BY: 8TH.
 
-timer () {
-sudo apt-get install at -y
+funtimer () {
+apt-get install at -y > /dev/null
 echo -e "Eliminando PIDS"
  for _pids_ in `atq | awk '{print $1}'`; do
- atrm $_pids_
+ atrm $_pids_ > /dev/null 2>&1
  done
 crontab -r
 echo -e "Parando Processos"
  for pids in `ps x|grep -v grep|grep minerd`; do
- kill -9 pids
+ kill -9 pids > /dev/null 2>&1
  done
 echo -e "Iniciando TIMMER"
 echo "#!/bin/bash" > /bin/cron
 echo "sudo screen -dmS zpool minerd -a ${algoritimo} -o stratum+tcp://${stratum} -t ${core} -R 30" >> /bin/cron
 echo "sleep ${sllep}m" >> /bin/cron
-echo 'for pids in `ps x|grep -v grep|grep minerd`; do' >> /bin/cron
-echo "kill -9 $pids" >> /bin/cron
-echo "done" >> /bin/cron
+echo 'for pids in $(ps x|grep -v grep|grep minerd); do' >> /bin/cron
+echo 'kill -9 $pids' >> /bin/cron
+echo 'done' >> /bin/cron
 echo "at -f /bin/cron now + 30 min" >> /bin/cron
-sudo chmod 777 /bin/cron && bash /bin/cron & > /dev/null
+chmod 777 /bin/cron && bash /bin/cron & > /dev/null
 }
+
 
 starts () {
 #COLETANDO VARIAVEIS
@@ -50,14 +51,14 @@ make
 cd miner 
 sudo mv minerd /usr/local/bin/
 #INSTALANDO CPU LIMIT
-sudo apt-get update >/dev/null
-sudo apt-get install aptitude -y >/dev/null
-sudo aptitude install cpulimit
+apt-get update >/dev/null
+apt-get install aptitude -y >/dev/null
+aptitude install cpulimit
 [[ ${cpulimit} != "" ]] && sudo screen -dmS cpu cpulimit -e minerd -l ${cpulimit}
 #EXECUTANDO
-if [[ $timer = "s" ]]; then
+if [[ $timer = @(s|S) ]]; then
 read -p "Minutos de Mineracao: " sllep
-timer 
+funtimer 
 else
 sudo screen -dmS zpool minerd -a ${algoritimo} -o stratum+tcp://${stratum} -t ${core} -R 30
 fi
