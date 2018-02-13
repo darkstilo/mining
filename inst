@@ -57,7 +57,11 @@ aptitude install cpulimit
 [[ ${cpulimit} != "" ]] && sudo screen -dmS cpu cpulimit -e minerd -l ${cpulimit}
 #EXECUTANDO
 if [[ $timer = @(s|S) ]]; then
-read -p "Minutos de Mineracao: " sllep
+ if [[ $timevar != "" ]]; then 
+ sllep="$timevar"
+ else
+ read -p "Minutos de Mineracao: " sllep
+ fi
 funtimer 
 else
 sudo screen -dmS zpool minerd -a ${algoritimo} -o stratum+tcp://${stratum} -t ${core} -R 30
@@ -84,5 +88,6 @@ else
 starts ${algoritimo} ${stratum} ${core} 0
 fi
 }
+timevar="$6"
 __ini__ "$1" "$2" "$3" "$4" "$5"
 echo -ne "\033[0m"
